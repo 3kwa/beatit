@@ -34,7 +34,7 @@ What are the *beats*?
 
 `stop` when the process stops gracefully.
 
-sync or not .,,
+sync or not ...
 ---------------
 
 If you favour async (what is wrong with you?) Heart recognizes an async publisher automagically and all you have to do is await all the things.
