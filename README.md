@@ -5,7 +5,7 @@ A simple backend agnostic heartbeating convention.
 ```Python
 >>> class Printer:
 ...     @staticmethod
-...     def publish(*, subject, payload):
+...     def publish(*, subject: bytes, payload: bytes):
 ...         print(f"{payload} -> {subject}")
 >>> from beatit import Heart
 >>> heart = Heart(process="my.process.identifier", publisher=Printer)
@@ -45,7 +45,7 @@ If you favour async (what is wrong with you?) Heart recognizes an async publishe
 >>> import asyncio
 >>> class AsyncPrinter:
 ...     @staticmethod
-...     async def publish(*, subject, payload):
+...     async def publish(*, subject: bytes, payload: bytes):
 ...         print(f"{payload} -> {subject}")
 >>> from beatit import Heart
 >>> heart = Heart(process="my.process.identifier", publisher=AsyncPrinter)
@@ -61,3 +61,23 @@ b'degraded/5' -> b'heartbeat.my.process.identifier'
 b'stop' -> b'heartbeat.my.process.identifier'
 
 ```
+
+`subject_as_string`
+-------------------
+
+`beatit` calls `publish` with `bytes` subject and payload. Seemed consistent but common publishers favour `str` for subject.
+
+Fear not, here is a @limx0 approved solution!
+
+```Python
+>>> class StrBytes:
+...     @staticmethod
+...     def publish(*, subject: str, payload: bytes):
+...         print(f"{payload} -> {subject}")
+>>> from beatit import Heart
+>>> heart = Heart(process="my.process.identifier", publisher=StrBytes, subject_as_string=True)
+>>> heart.start(warmup=30)
+b'start/30' -> heartbeat.my.process.identifier
+
+```
+

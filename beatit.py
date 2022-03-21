@@ -1,6 +1,6 @@
 """A simple backend agnostic heartbeating convention"""
 
-__version__ = "2022.3.0"
+__version__ = "2022.3.1"
 
 import time
 import asyncio
@@ -22,13 +22,16 @@ class Heart:
     >>> heart = Heart("my.process.identifier", publisher=AsyncPrinter)
     >>> heart.__class__.__name__
     '_Async'
+    >>> heart = Heart("my.process.identifier", publisher=Printer, subject_as_string=True)
+    >>> heart.start(warmup=30)
+    b'start/30' -> heartbeat.my.process.identifier
     """
 
-    def __new__(cls, process, *, publisher):
+    def __new__(cls, process, *, publisher, subject_as_string=False):
         if asyncio.iscoroutinefunction(publisher.publish):
-            return _Async(process=process, publisher=publisher)
+            return _Async(process=process, publisher=publisher, subject_as_string=subject_as_string)
         else:
-            return _Sync(process=process, publisher=publisher)
+            return _Sync(process=process, publisher=publisher, subject_as_string=subject_as_string)
 
 
 class _Sync:
@@ -50,12 +53,15 @@ class _Sync:
     b'stop' -> b'heartbeat.my.process.identifier'
     """
 
-    def __init__(self, *, process, publisher, max_frequency=1):
+    def __init__(self, *, process, publisher, max_frequency=1, subject_as_string=False):
         self.process = process
         self.publisher = publisher
         self.max_frequency = max_frequency
         self._last_beat = 0
         self._last_degraded = 0
+        self._subject = (
+            f"heartbeat.{process}" if subject_as_string else f"heartbeat.{process}".encode()
+        )
 
     def start(self, *, warmup):
         self._publish(f"start/{warmup}".encode())
@@ -78,7 +84,7 @@ class _Sync:
             self._publish(f"beat/{period}".encode())
 
     def _publish(self, message):
-        self.publisher.publish(subject=f"heartbeat.{self.process}".encode(), payload=message)
+        self.publisher.publish(subject=self._subject, payload=message)
 
 
 class _Async:
@@ -100,12 +106,15 @@ class _Async:
     b'stop' -> b'heartbeat.my.process.identifier'
     """
 
-    def __init__(self, *, process, publisher, max_frequency=1):
+    def __init__(self, *, process, publisher, max_frequency=1, subject_as_string=False):
         self.process = process
         self.publisher = publisher
         self.max_frequency = max_frequency
         self._last_beat = 0
         self._last_degraded = 0
+        self._subject = (
+            f"heartbeat.{process}" if subject_as_string else f"heartbeat.{process}".encode()
+        )
 
     async def start(self, *, warmup):
         await self._publish(f"start/{warmup}".encode())
@@ -126,4 +135,4 @@ class _Async:
             await self._publish(f"beat/{period}".encode())
 
     async def _publish(self, message):
-        await self.publisher.publish(subject=f"heartbeat.{self.process}".encode(), payload=message)
+        await self.publisher.publish(subject=self._subject, payload=message)
