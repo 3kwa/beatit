@@ -1,6 +1,6 @@
 """A simple backend agnostic heartbeating convention"""
 
-__version__ = "2021.4.0"
+__version__ = "2022.3.0"
 
 import time
 import asyncio
