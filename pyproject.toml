@@ -6,6 +6,7 @@ build-backend = "flit_core.buildapi"
 name = "beatit"
 authors = [{name = "Eugene Van den Bulke", email = "eugene.vandenbulke@gmail.com"}]
 readme = "README.md"
+license = {file = "LICENSE"}
 dynamic = ["version", "description"]
 
 [project.urls]
