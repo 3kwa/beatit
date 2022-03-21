@@ -5,7 +5,7 @@ A simple backend agnostic heartbeating convention.
 ```Python
 >>> class Printer:
 ...     @staticmethod
-...     def publish(subject, *, payload):
+...     def publish(*, subject, payload):
 ...         print(f"{payload} -> {subject}")
 >>> from beatit import Heart
 >>> heart = Heart(process="my.process.identifier", publisher=Printer)
@@ -22,7 +22,7 @@ b'stop' -> b'heartbeat.my.process.identifier'
 
 ```
 
-All you need is a publisher with a `publish` method accepting a positional `subject` parameter and a named `payload`.
+All you need is a publisher with a `publish` method accepting two named arguments `subject` and `payload`.
 
 Instantiate a `Heart` instance with a `process` name and a `publisher`. *beats* will be published on the subject `heartbeat.<process>`.
 
@@ -45,7 +45,7 @@ If you favour async (what is wrong with you?) Heart recognizes an async publishe
 >>> import asyncio
 >>> class AsyncPrinter:
 ...     @staticmethod
-...     async def publish(subject, *, payload):
+...     async def publish(*, subject, payload):
 ...         print(f"{payload} -> {subject}")
 >>> from beatit import Heart
 >>> heart = Heart(process="my.process.identifier", publisher=AsyncPrinter)

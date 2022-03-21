@@ -17,7 +17,7 @@ class Heart:
     '_Sync'
     >>> class AsyncPrinter:
     ...     @staticmethod
-    ...     async def publish(subject, *, payload):
+    ...     async def publish(*, subject, payload):
     ...         print(f"{payload} -> {subject}")
     >>> heart = Heart("my.process.identifier", publisher=AsyncPrinter)
     >>> heart.__class__.__name__
@@ -35,7 +35,7 @@ class _Sync:
     """
     >>> class Printer:
     ...     @staticmethod
-    ...     def publish(subject, *, payload):
+    ...     def publish(*, subject, payload):
     ...         print(f"{payload} -> {subject}")
     >>> heart = _Sync(process="my.process.identifier", publisher=Printer)
     >>> heart.start(warmup=60)
@@ -85,7 +85,7 @@ class _Async:
     """
     >>> class AsyncPrinter:
     ...     @staticmethod
-    ...     async def publish(subject, *, payload):
+    ...     async def publish(*, subject, payload):
     ...         print(f"{payload} -> {subject}")
     >>> heart = _Async(process="my.process.identifier", publisher=AsyncPrinter)
     >>> asyncio.run(heart.start(warmup=60))
