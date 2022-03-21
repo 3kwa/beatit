@@ -1,3 +1,7 @@
+"""A simple backend agnostic heartbeating convention"""
+
+__version__ = "2021.4.0"
+
 import time
 import asyncio
 
